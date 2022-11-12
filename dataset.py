@@ -34,15 +34,18 @@ def data_preprocessing(data_root, train_val_split=0.8):
     train_num = int(train_val_num * train_val_split)
 
     train_dataset = dataset.iloc[idx_list[:train_num]].values
-    pretrain_dataset = train_dataset[train_dataset[:, -1] == 0]
+    mean = np.mean(train_dataset[:, :-1])
+    std = np.std(train_dataset[:, :-1])
+    train_dataset[:, :-1] = (train_dataset[:, :-1] - mean) / std
     val_dataset = dataset.iloc[idx_list[train_num:train_val_num]].values
+    val_dataset[:, :-1] = (val_dataset[:, :-1] - mean) / std
     test_dataset = dataset.iloc[idx_list[train_val_num:]].values
+    test_dataset[:, :-1] = (test_dataset[:, :-1] - mean) / std
     np.save(os.path.join(data_root, 'test.npy'), test_dataset)
 
     train_dataset = ECG5000(train_dataset)
-    pretrain_dataset = ECG5000(pretrain_dataset)
     val_dataset = ECG5000(val_dataset)
     test_dataset = ECG5000(test_dataset)
 
 
-    return train_dataset, val_dataset, test_dataset, pretrain_dataset
+    return train_dataset, val_dataset, test_dataset

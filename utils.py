@@ -26,6 +26,27 @@ def geom_noise_mask_single(L, lm, masking_ratio):
 
     return keep_mask
 
+def positive_negative_sampling(x, y, all_data, num_samples=8):
+    positive_samples = []
+    negative_samples = []
+    normal_samples = all_data[all_data[:, -1] == 0]
+    abnormal_samples = all_data[all_data[:, -1] == 1]
+    for i in range(len(y)):
+        if y[i] == 0:
+            positive_samples_index = np.random.choice(normal_samples.shape[0], num_samples, replace=False)
+            positive_samples.append(normal_samples[positive_samples_index, :-1])
+            negative_samples_index = np.random.choice(abnormal_samples.shape[0], num_samples, replace=False)
+            negative_samples.append(abnormal_samples[negative_samples_index, :-1])
+        else:
+            positive_samples_index = np.random.choice(abnormal_samples.shape[0], num_samples, replace=False)
+            positive_samples.append(abnormal_samples[positive_samples_index, :-1])
+            negative_samples_index = np.random.choice(normal_samples.shape[0], num_samples, replace=False)
+            negative_samples.append(normal_samples[negative_samples_index, :-1])
+
+    positive_samples = np.array(positive_samples)
+    negative_samples = np.array(negative_samples)
+    return positive_samples, negative_samples
+
 def performance_display(metric_value, metric_name, output_path):
     color = ['b', 'r', 'g', 'c', 'm', 'y', 'k']
     for index, (name, values) in enumerate(metric_value.items()):
