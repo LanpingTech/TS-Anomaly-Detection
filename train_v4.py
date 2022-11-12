@@ -205,7 +205,7 @@ performance_display(train_f1_display, 'Training-F1', 'output')
 
 
 # Save Model
-torch.save({'C': C, 'R': R, 'model_dict': model.state_dict()}, 'output/model.pth')
+torch.save(model.state_dict(), 'output/model.pth')
 
 
 
